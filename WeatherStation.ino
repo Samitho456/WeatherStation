@@ -42,7 +42,7 @@ PMS7003:
 ToDo:
   Add touch screen / test if enough pins
   Add battery / charging
-  Add Automatic Switch between and plug 
+  Add Automatic Switch between and plug
   Make screen only turn on when plugged into outlet
   Remove all serial conncetion and run only on power and api
   Design 3d og box to contain components
@@ -122,29 +122,32 @@ void handleGetInfo() {
   // Calculate average CO2
   double avg_co2 = (n_measurements > 0) ? total_co2 / (double)n_measurements : 0;
 
+  doc["device"] = "ESP32 WeatherStation";
+  doc["uptime"] = millis() / 1000;
+
   // Check if DHT22 reading failed
   if (isnan(temperatureDHT) || isnan(humidity) || isnan(hic)) {
-    doc["temperature_dht22"] = "Error reading temperature";
-    doc["humidity"] = "Error reading humidity";
-    doc["HeatIndex"] = "Error calculation Heat Index";
+    doc["dht22"]["temperature"] = "Error reading temperature";
+    doc["dht22"]["humidity"] = "Error reading humidity";
+    doc["dht22"]["HeatIndex"] = "Error calculation Heat Index";
   } else {
-    doc["temperature_dht22"] = temperatureDHT;
-    doc["humidity"] = humidity;
-    doc["HeatIndex"] = hic;
+    doc["dht22"]["temperature"] = temperatureDHT;
+    doc["dht22"]["humidity"] = humidity;
+    doc["dht22"]["HeatIndex"] = hic;
   }
 
   // Check if BMP280 reading failed
   if (isnan(pressure)) {
-    doc["pressure"] = "Error reading pressure";
+    doc["bmp280"]["pressure"] = "Error reading pressure";
   } else {
-    doc["pressure"] = pressure;
+    doc["bmp280"]["pressure"] = pressure;
   }
 
   // Check if S8 CO2 reading failed
   if (co2 <= 0) {
-    doc["co2"] = "Error reading CO2 level";
+    doc["senseair_s8"]["co2"] = "Error reading CO2 level";
   } else {
-    doc["co2"] = co2;
+    doc["senseair_s8"]["co2"] = co2;
   }
 
   // Include average CO2 in the response
@@ -159,20 +162,15 @@ void handleGetInfo() {
         uint16_t pm2_5 = (buffer[12] << 8) | buffer[13];
         uint16_t pm10  = (buffer[14] << 8) | buffer[15];  
 
-        doc["pm1.0"] = pm1_0;
-        doc["pm2.5"] = pm2_5;
-        doc["pm10"] = pm10;
+        doc["pms7003"]["pm1.0"] = pm1_0;
+        doc["pms7003"]["pm2.5"] = pm2_5;
+        doc["pms7003"]["pm10"] = pm10;
       }
     }
   } 
   else {
     doc["PMS7003"] = "Sensor not warmed up";
   }
-
-
-  doc["device"] = "ESP32 WeatherStation";
-  doc["uptime"] = millis() / 1000;
-  doc["status"] = "active";
 
   String jsonResponse;
   serializeJson(doc, jsonResponse);
