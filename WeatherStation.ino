@@ -58,8 +58,8 @@ ToDo:
 #include <HardwareSerial.h>
 #include "s8_uart.h"
 
-const char* ssid = "larsen";
-const char* password = "samitho3";
+const char* ssid = "XXX";
+const char* password = "XXX";
 
 // Set DHT pin and type
 #define DHTPIN 4
